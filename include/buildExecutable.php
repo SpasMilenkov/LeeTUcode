@@ -4,37 +4,49 @@ include_once "dbHandler.php";
 include_once "courseTask.php";
 
 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $file_contents = "";
-    if (isset($_FILES["submition_file"]) && $_FILES["submition_file"]["error"] == 0) {
-        $file_name = $_FILES["submition_file"]["name"];
-        $file_tmp = $_FILES["submition_file"]["tmp_name"];
+    if (isset($_POST["solution"]) && isset($_POST["taskId"])) {
+        $functionImplementation = htmlspecialchars_decode($_POST["solution"], ENT_NOQUOTES);
+        $taskId = $_POST["taskId"];
 
-        // Check if the file has a .txt extension
-        $file_extension = pathinfo($file_name, PATHINFO_EXTENSION);
-        if ($file_extension == "txt") {
-            // Read the contents of the file
-            $file_contents = file_get_contents($file_tmp);
+        $taskArray = $dbHandler->getCourseTaskById($taskId);
 
-            $serializedTask = $_POST['serializedTask'];
-            $task = unserialize(base64_decode($serializedTask));
-            $builtCppFile = $task->addSubmition($file_contents);
+        if ($taskArray) {
+            $task = new CourseTask(
+                $taskArray["id"],
+                $taskArray["name"],
+                $taskArray["description"],
+                $taskArray["function_name"],
+                $taskArray["function_declaration"],
+                explode("@@@", $taskArray["test_cases"]),
+                explode("@@@", $taskArray["test_answers"]),
+                $taskArray["course_id"],
+                $taskArray["difficulty"],
+                $functionImplementation,
+                $taskArray["teacher_solution"]
+            );
+
+            // Building the full C++ file with the user's function implementation
+            $builtCppFile = $task->addSubmition($functionImplementation);
+
             $_SESSION['cppFile'] = $builtCppFile;
 
-            //Upload the task submition to db
-            $dbHandler->createTaskSubmition($file_contents, "fail", $task->getId(), $_SESSION["user_id"]);
+            // Upload the task submission to the database
+            $dbHandler->createTaskSubmition($functionImplementation, "fail", $task->getId(), $_SESSION["user_id"]);
             $insertedTask = $dbHandler->getLastInsertedTaskSubmition();
 
             header('Location: ../taskSubmitionPage.php?id=' . $insertedTask['id']);
             exit();
-
         } else {
-            echo "Only txt files can be submited!";
+            echo "Task not found!";
         }
-
     } else {
-        echo "File error!";
+        echo "Solution or task ID not provided!";
     }
 } else {
-    echo "Invalid way of getting to this page!";
+    echo "Invalid request method!";
 }
