@@ -7,10 +7,11 @@ class dbHandler
     public function __construct()
     {
         try {
-            $host = "localhost";
+            $host = "127.0.0.1"; // If port 3306 is mapped to the host's port 3306
             $dbname = "leetucode";
             $dbusername = "root";
-            $dbpassword = "";
+            $dbpassword = "admin"; // The MYSQL_ROOT_PASSWORD you set for the container
+
 
             $this->mysqli = new mysqli($host, $dbusername, $dbpassword, $dbname);
             if ($this->mysqli->connect_errno) {
@@ -237,10 +238,19 @@ class dbHandler
     }
 
     //==============================================CourseTask==============================================
-    public function createCourseTask($name, $description, $function_name, $function_declaration, $test_cases, $test_answers, $course_id, $difficulty)
+    public function createCourseTask($name,
+                                     $description,
+                                     $function_name,
+                                     $function_declaration,
+                                     $test_cases,
+                                     $test_answers,
+                                     $course_id,
+                                     $difficulty,
+                                     $student_template,
+                                     $teacher_solution)
     {
-        $myQuery = $this->mysqli->prepare("INSERT INTO course_tasks (name, description, function_name, function_declaration, test_cases, test_answers, course_id, difficulty) VALUES (?,?,?,?,?,?,?,?);"); //Prepare the sql query
-        $myQuery->bind_param("ssssssis", $name, $description, $function_name, $function_declaration, $test_cases, $test_answers, $course_id, $difficulty); //bind the params in place of the '?'
+        $myQuery = $this->mysqli->prepare("INSERT INTO course_tasks (name, description, function_name, function_declaration, test_cases, test_answers, course_id, difficulty, student_template, teacher_solution) VALUES (?,?,?,?,?,?,?,?,?,?);"); //Prepare the sql query
+        $myQuery->bind_param("ssssssisss", $name, $description, $function_name, $function_declaration, $test_cases, $test_answers, $course_id, $difficulty, $student_template, $teacher_solution); //bind the params in place of the '?'
         $myQuery->execute(); //Execute the statement
         $myQuery->close(); //Free/close the statement         
     }
