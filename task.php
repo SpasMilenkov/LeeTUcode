@@ -71,8 +71,7 @@ if (isset($_GET["id"])&&
                     <div class="row mt-3">
                         <div class="col-lg-12">
                             <h4>How to use:</h4>
-                            <p>Please, provide file with a function deffinition that completes the given task with name and
-                                parameters as specified below!</p>
+                            <p>Please, fill out the template in the code editor!</p>
                         </div>
                     </div>
                     <div class="row mt-3">

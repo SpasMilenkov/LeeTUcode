@@ -15,7 +15,7 @@ if (isset($_SESSION['cppFile'])) {
         <div class="container mt-5">
             <div class="row">
                 <div class="submition-result col-12 bg-light border border-secondary rounded ps-3 pt-2">
-                    <h3>Submition result:</h3>
+                    <h3>Submission result:</h3>
                     <p id="codeoutput" style="min-height: 100px;"></p>
                 </div>
             </div>
