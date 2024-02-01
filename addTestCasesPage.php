@@ -29,7 +29,8 @@
             $func_name = $_POST["func_name"];
             $func_declaration = $_POST["func_declaration"];
             $num_tests = $_POST["num_tests"];
-
+            $student_template = $_POST["student_template"];
+            $teacher_solution = $_POST["teacher_solution"];
             //ERROR HANDLERS
             $error = "";
 
@@ -69,6 +70,12 @@
 
                             <input type="text" class="form-control" name="num_tests" id="num_tests_input"
                                 value="<?php echo $num_tests; ?>" required>
+                            <textarea name="student_template" id="student_template" rows="10" cols="50" required>
+                                <?php echo htmlspecialchars($student_template ?? ''); ?>
+                            </textarea>
+                            <textarea name="teacher_solution" id="teacher_solution" rows="10" cols="50" required>
+                                <?php echo htmlspecialchars($teacher_solution ?? ''); ?>
+                            </textarea>
                         </div>
                         <?php for ($i = 0; $i < intval($num_tests); $i++) { ?>
                             <div class="row">
