@@ -1,10 +1,9 @@
 <?php
 include_once "include/dbHandler.php";
 include_once "include/courseTask.php";
-?>
-<?php
 include_once "components/head.php";
 
+$baseCppCode = "/* Your base C++ code here */";
 //Construction
 if (isset($_GET["id"])&&
     $taskArray = $dbHandler->getCourseTaskById($_GET["id"])) 
@@ -20,16 +19,36 @@ if (isset($_GET["id"])&&
         $testCases,
         $testAnswers,
         $taskArray["course_id"],
-        $taskArray["difficulty"]
-    );
+        $taskArray["difficulty"],
+        $taskArray["student_template"],
+        $taskArray["teacher_solution"]
+    );  
 }
 ?>
+<style>
+    .container {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+    }
 
+    .task-info,
+    .upload-submition-container {
+        flex-grow: 1;
+    }
+
+    /* Media query for screen sizes that require a vertical layout */
+    @media (max-width: 768px) {
+        .container {
+            flex-direction: column;
+        }
+    }
+</style>
 <body>
     <?php include_once "components/header.php" ?>
     <main>
 
-        <div class="container my-5">
+        <div class="container my-5 d-flex">
             <div class="task-info bg-light border border-secondary rounded ps-3 pe-3 pt-2">
                 <?php if (!isset($task)) echo '<h4>Task not found!</h4>';
                 else {?>
@@ -104,25 +123,23 @@ if (isset($_GET["id"])&&
 
 
             <div class="row">
-                <div class="col-4 upload-submition-container bg-light border border-secondary rounded ps-3 pt-2 mt-5 mb-5
-                    upload-form-container d-flex text-center mx-auto">
+                <div class="upload-submition-container bg-light border border-secondary rounded ps-3 pt-2 mt-5 mb-5 upload-form-container d-flex text-center mx-auto">
                     <?php
                     if (isset($_SESSION["user_id"])) {
                         if ($user->hasJoinedCourse($dbHandler, $task->getCourseId())) {
-                            $serializedTask = base64_encode(serialize($task));
-                            echo '<form class="form-upload mx-auto" action="include/buildExecutable.php" method="post" enctype="multipart/form-data">
-                                        <h2 class="form-upload-heading">Upload solution</h2>
-                                        <input type="hidden" name="serializedTask" value="' . $serializedTask . '">
-                                        <input type="file" class="form-control" name="submition_file" accept=".txt" required>
-                                        <div class="centered mt-3">
-                                            <button class="btn btn-lg btn-primary btn-block" type="submit" name="submit">Upload</button>
-                                        </div>
-                                    </form>';
+                            echo '<form class="form-upload mx-auto" action="include/buildExecutable.php" method="post">
+                    <h2 class="form-upload-heading">Submit your solution</h2>
+                    <textarea class="form-control" name="solution" rows="10" required>' . htmlspecialchars($task->getBaseCppCode()) . '</textarea>
+                    <input type="hidden" name="taskId" value="' . $task->getId() . '">
+                    <div class="centered mt-3">
+                        <button class="btn btn-lg btn-primary btn-block" type="submit" name="submit">Submit</button>
+                    </div>
+                  </form>';
                         } else {
-                            echo "<h2>Join the course to upload a solution!</h2>";
+                            echo "<h2>Join the course to submit a solution!</h2>";
                         }
                     } else {
-                        echo '<h2>Log in to upload a solution!</h2>';
+                        echo '<h2>Log in to submit a solution!</h2>';
                     }
                     ?>
                 </div>
