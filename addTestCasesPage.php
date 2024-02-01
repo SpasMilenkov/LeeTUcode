@@ -108,7 +108,7 @@
                 </div>
             </div>
         <?php } else {
-            echo "Error: Forbiden way of getting to this page!";
+            echo "Error: Forbidden way of getting to this page!";
         } ?>
     </main>
     <?php include_once "components/footer.php" ?>
