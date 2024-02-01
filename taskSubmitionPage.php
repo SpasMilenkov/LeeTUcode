@@ -1,4 +1,13 @@
-<?php include_once "components/head.php" ?>
+<?php
+include_once "components/head.php";
+if (isset($_SESSION['cppFile'])) {
+    $safeCppFile = htmlentities($_SESSION['cppFile'], ENT_QUOTES, 'UTF-8');
+} else {
+    // Handle the case where 'cppFile' is not set in the session
+    $safeCppFile = ''; // Or set a default value or handle this case appropriately
+}
+
+?>
 
 <body>
     <?php include_once "components/header.php" ?>
@@ -19,8 +28,18 @@
     </main>
     <?php include_once "components/footer.php" ?>
     <script>
-        var cppFile = `<?php echo $_SESSION['cppFile']; ?>`
+        function decodeHtmlEntities(str) {
+            return str.replace(/&amp;/g, '&')
+                .replace(/&lt;/g, '<')
+                .replace(/&gt;/g, '>')
+                .replace(/&quot;/g, '"')
+                .replace(/&#39;/g, "'")
+                .replace(/&#039;/g, "'");
+        }
+        var cppFile = decodeHtmlEntities(`<?php echo $safeCppFile ?>`);
+        var sanitizedCppCode = decodeHtmlEntities(cppFile);
         console.log(cppFile);
+        console.log(sanitizedCppCode)
         var settings = {
             "url": "https://api.codex.jaagrav.in",
             "method": "POST",
@@ -35,6 +54,7 @@
                 "input": ""
             }),
         };
+
 
         $.ajax(settings).done(function (response) {
             var submitionStatus = "fail";
