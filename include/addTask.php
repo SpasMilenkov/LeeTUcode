@@ -1,7 +1,11 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") //if the user got to this page via POST
+if ($_SERVER["REQUEST_METHOD"] == "POST")
 {
+    trigger_error("Debugging - post content here" . var_dump($_POST));
     $course_id = $_POST["course_id"];
     $difficulty = $_POST["difficulty"];
     $name = $_POST["name"];
@@ -9,6 +13,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") //if the user got to this page via POS
     $func_name = $_POST["func_name"];
     $func_declaration = $_POST["func_declaration"];
     $num_tests = $_POST["num_tests"];
+    $studentTemplate = trim(isset($_POST["student_template"]) ? html_entity_decode($_POST["student_template"], ENT_QUOTES, 'UTF-8') : '');
+    $teacherSolution = trim(isset($_POST["teacher_solution"]) ? html_entity_decode($_POST["teacher_solution"], ENT_QUOTES, 'UTF-8') : '');
 
     $testCasesArr = [];
     $answersArr = [];
@@ -44,7 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") //if the user got to this page via POS
             }
         }
 
-        if (utils\isInputEmpty($difficulty, $name, $description, $func_name, $func_declaration, $num_tests)) {
+        if (utils\isInputEmpty($difficulty, $name, $description, $func_name, $func_declaration, $num_tests, $studentTemplate, $teacherSolution)) {
             $error = "Fill in all fields, please!";
         } else {
             $position = strpos($func_declaration, '(');
@@ -82,7 +88,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") //if the user got to this page via POS
             $answers = $answers . $answersArr[$num_tests - 1];
 
 
-            $dbHandler->createCourseTask($name, $description, $func_name, $func_declaration, $testCases, $answers, $course_id, $difficulty);
+            $dbHandler->createCourseTask($name, $description, $func_name, $func_declaration, $testCases, $answers, $course_id, $difficulty, $studentTemplate, $teacherSolution);
             header('Location: ../course.php?id=' . $course_id . '$addTask=success');
             die(); //Kill the script
 
